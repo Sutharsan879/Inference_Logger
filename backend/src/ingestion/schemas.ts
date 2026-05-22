@@ -4,7 +4,7 @@ export const logIngestSchema = z.object({
   conversationId: z.string().uuid(),
   sessionId: z.string().optional(),
   messageId: z.string().uuid().optional(),
-  provider: z.enum(['anthropic', 'openai', 'gemini']),
+  provider: z.enum(['anthropic', 'openai', 'gemini', 'groq']),
   model: z.string().min(1),
   promptTokens: z.number().int().nonnegative().optional(),
   completionTokens: z.number().int().nonnegative().optional(),

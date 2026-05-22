@@ -5,9 +5,10 @@ import { api } from '@/lib/api';
 import type { ChatMessage, Provider, TokenUsage } from '@/types';
 
 const DEFAULT_MODELS: Record<Provider, string> = {
+  groq: 'llama-3.3-70b-versatile',
   anthropic: 'claude-3-5-sonnet-20241022',
   openai: 'gpt-4o-mini',
-  gemini: 'gemini-2.0-flash',
+  gemini: 'gemini-2.5-flash',
 };
 
 interface UseChatOptions {

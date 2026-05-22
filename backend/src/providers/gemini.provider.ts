@@ -7,6 +7,8 @@ import { env } from '../config/env';
 import type { ChatMessage } from '../types';
 import type { LLMProvider, LLMResponse } from './base.provider';
 
+const DEFAULT_MODEL = 'gemini-2.5-flash';
+
 export class GeminiProvider implements LLMProvider {
   private client: GoogleGenerativeAI;
 
@@ -14,7 +16,19 @@ export class GeminiProvider implements LLMProvider {
     this.client = new GoogleGenerativeAI(env.GEMINI_API_KEY!);
   }
 
-  async complete(messages: ChatMessage[], model = 'gemini-2.0-flash'): Promise<LLMResponse> {
+  async complete(messages: ChatMessage[], model = DEFAULT_MODEL): Promise<LLMResponse> {
+    return withGeminiCall(() => this.runComplete(messages, model));
+  }
+
+  async stream(
+    messages: ChatMessage[],
+    onToken: (token: string) => void,
+    model = DEFAULT_MODEL
+  ): Promise<LLMResponse> {
+    return withGeminiCall(() => this.runStream(messages, onToken, model));
+  }
+
+  private async runComplete(messages: ChatMessage[], model: string): Promise<LLMResponse> {
     const { systemInstruction, history, message } = toGeminiInput(messages);
     const genModel = this.client.getGenerativeModel({ model, systemInstruction });
     const chat = genModel.startChat({ history });
@@ -22,10 +36,10 @@ export class GeminiProvider implements LLMProvider {
     return toLLMResponse(result.response, messages, model);
   }
 
-  async stream(
+  private async runStream(
     messages: ChatMessage[],
     onToken: (token: string) => void,
-    model = 'gemini-2.0-flash'
+    model: string
   ): Promise<LLMResponse> {
     const { systemInstruction, history, message } = toGeminiInput(messages);
     const genModel = this.client.getGenerativeModel({ model, systemInstruction });
@@ -48,6 +62,55 @@ export class GeminiProvider implements LLMProvider {
       model,
     };
   }
+}
+
+async function withGeminiCall<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const retrySec = parseRetrySeconds(msg);
+    if (retrySec != null && isRateLimitError(msg)) {
+      await delay((retrySec + 1) * 1000);
+      try {
+        return await fn();
+      } catch (retryErr) {
+        throw formatGeminiError(retryErr);
+      }
+    }
+    throw formatGeminiError(err);
+  }
+}
+
+function isRateLimitError(msg: string): boolean {
+  return msg.includes('429') || msg.includes('Too Many Requests') || msg.includes('RESOURCE_EXHAUSTED');
+}
+
+function parseRetrySeconds(msg: string): number | null {
+  const match = msg.match(/retry in ([\d.]+)s/i);
+  return match ? Number(match[1]) : null;
+}
+
+function formatGeminiError(err: unknown): Error {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (!isRateLimitError(msg)) {
+    return err instanceof Error ? err : new Error(msg);
+  }
+  if (msg.includes('limit: 0')) {
+    return new Error(
+      'Gemini free tier is not enabled for this API key (quota limit: 0). ' +
+        'In Google AI Studio: open your project → Billing → link a billing account (free tier still applies), ' +
+        'or create a new key at https://aistudio.google.com/apikey. ' +
+        'Then try model gemini-2.5-flash.'
+    );
+  }
+  const wait = parseRetrySeconds(msg);
+  const waitHint = wait != null ? ` Wait ~${Math.ceil(wait)}s and try again.` : '';
+  return new Error(`Gemini rate limit exceeded.${waitHint} Try gemini-2.5-flash or fewer messages per minute.`);
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 function toGeminiInput(messages: ChatMessage[]): {

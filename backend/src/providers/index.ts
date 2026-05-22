@@ -4,6 +4,7 @@ import type { LLMProvider } from './base.provider';
 import { AnthropicProvider } from './anthropic.provider';
 import { OpenAIProvider } from './openai.provider';
 import { GeminiProvider } from './gemini.provider';
+import { GroqProvider } from './groq.provider';
 import { MockProvider } from './mock.provider';
 
 const mock = new MockProvider();
@@ -16,6 +17,8 @@ export function hasApiKey(provider: Provider): boolean {
       return Boolean(env.OPENAI_API_KEY?.trim());
     case 'gemini':
       return Boolean(env.GEMINI_API_KEY?.trim());
+    case 'groq':
+      return Boolean(env.GROQ_API_KEY?.trim());
     default:
       return false;
   }
@@ -50,6 +53,12 @@ class ProviderFactory {
           return mock;
         }
         return new GeminiProvider();
+      case 'groq':
+        if (!hasApiKey('groq')) {
+          console.warn('GROQ_API_KEY missing — using mock. Add key to backend/.env for real answers.');
+          return mock;
+        }
+        return new GroqProvider();
       default:
         return mock;
     }
@@ -65,5 +74,6 @@ export const providerFactory = new ProviderFactory();
 export const DEFAULT_MODELS: Record<Provider, string> = {
   anthropic: 'claude-3-5-sonnet-20241022',
   openai: 'gpt-4o-mini',
-  gemini: 'gemini-2.0-flash',
+  gemini: 'gemini-2.5-flash',
+  groq: 'llama-3.3-70b-versatile',
 };

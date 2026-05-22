@@ -1,4 +1,4 @@
-export type Provider = 'anthropic' | 'openai' | 'gemini';
+export type Provider = 'anthropic' | 'openai' | 'gemini' | 'groq';
 export type ConversationStatus = 'active' | 'cancelled' | 'completed';
 export type MessageRole = 'user' | 'assistant' | 'system';
 export type LogStatus = 'success' | 'error' | 'cancelled';

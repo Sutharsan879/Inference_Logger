@@ -13,7 +13,7 @@ import { asyncHandler } from '../middleware/asyncHandler';
 const createSchema = z.object({
   sessionId: z.string().min(1),
   title: z.string().min(1),
-  provider: z.enum(['anthropic', 'openai', 'gemini']),
+  provider: z.enum(['anthropic', 'openai', 'gemini', 'groq']),
   model: z.string().min(1),
 });
 

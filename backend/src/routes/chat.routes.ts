@@ -11,7 +11,7 @@ const messageSchema = z.object({
 
 const chatBodySchema = z.object({
   messages: z.array(messageSchema).min(1),
-  provider: z.enum(['anthropic', 'openai', 'gemini']),
+  provider: z.enum(['anthropic', 'openai', 'gemini', 'groq']),
   model: z.string().optional(),
   conversationId: z.string().uuid().optional(),
   sessionId: z.string().optional(),

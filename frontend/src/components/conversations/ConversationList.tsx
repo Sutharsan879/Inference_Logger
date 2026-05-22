@@ -43,6 +43,7 @@ export function ConversationList() {
         </select>
         <select value={provider} onChange={(e) => setProvider(e.target.value)} className={selectClass}>
           <option value="">All providers</option>
+          <option value="groq">Groq</option>
           <option value="anthropic">Anthropic</option>
           <option value="openai">OpenAI</option>
           <option value="gemini">Gemini</option>

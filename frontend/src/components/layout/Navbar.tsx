@@ -6,15 +6,17 @@ import { Badge } from '@/components/ui/Badge';
 import { api } from '@/lib/api';
 
 const PROVIDERS: { value: Provider; label: string }[] = [
+  { value: 'groq', label: 'Groq' },
   { value: 'anthropic', label: 'Anthropic' },
   { value: 'openai', label: 'OpenAI' },
   { value: 'gemini', label: 'Gemini' },
 ];
 
 const MODELS: Record<Provider, string[]> = {
+  groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'openai/gpt-oss-20b'],
   anthropic: ['claude-3-5-sonnet-20241022', 'claude-sonnet-4-20250514'],
   openai: ['gpt-4o-mini', 'gpt-4o', 'gpt-4.1-mini'],
-  gemini: ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-pro'],
+  gemini: ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'],
 };
 
 interface NavbarProps {

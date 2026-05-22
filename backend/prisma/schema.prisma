@@ -12,6 +12,7 @@ enum Provider {
   anthropic
   openai
   gemini
+  groq
 }
 
 enum ConversationStatus {

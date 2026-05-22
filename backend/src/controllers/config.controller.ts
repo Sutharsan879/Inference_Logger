@@ -3,12 +3,14 @@ import { env } from '../config/env';
 import { hasApiKey, isLiveProvider } from '../providers';
 import type { Provider } from '../types';
 
+const ALL_PROVIDERS: Provider[] = ['groq', 'openai', 'anthropic', 'gemini'];
+
 export function buildHint(): string {
   if (env.MOCK_LLM) {
     return 'Set MOCK_LLM=false in backend/.env and add an API key for real AI answers.';
   }
-  if (!hasApiKey('anthropic') && !hasApiKey('openai') && !hasApiKey('gemini')) {
-    return 'Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY to backend/.env for real AI answers.';
+  if (!ALL_PROVIDERS.some((p) => hasApiKey(p))) {
+    return 'Add GROQ_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY, or GEMINI_API_KEY to backend/.env for real AI answers.';
   }
   return 'Select a provider that has an API key configured (see badge).';
 }
@@ -16,28 +18,24 @@ export function buildHint(): string {
 export function getProviderHint(provider: Provider): string {
   if (env.MOCK_LLM) return 'MOCK_LLM=true — set to false in backend/.env';
   if (isLiveProvider(provider)) return `Live ${provider} — real AI answers`;
+  if (provider === 'groq' && !hasApiKey('groq')) {
+    return 'Add GROQ_API_KEY to backend/.env (free at console.groq.com)';
+  }
   if (provider === 'anthropic' && !hasApiKey('anthropic')) {
-    return hasApiKey('openai')
-      ? 'Anthropic key missing — switch Provider to OpenAI, or add ANTHROPIC_API_KEY to .env'
-      : 'Add ANTHROPIC_API_KEY to backend/.env';
+    return 'Anthropic key missing — switch Provider or add ANTHROPIC_API_KEY to .env';
   }
   if (provider === 'openai' && !hasApiKey('openai')) {
-    return hasApiKey('anthropic') || hasApiKey('gemini')
-      ? 'OpenAI key missing — switch Provider, or add OPENAI_API_KEY to .env'
-      : 'Add OPENAI_API_KEY to backend/.env';
+    return 'OpenAI key missing — switch Provider or add OPENAI_API_KEY to .env';
   }
   if (provider === 'gemini' && !hasApiKey('gemini')) {
-    return hasApiKey('openai') || hasApiKey('anthropic')
-      ? 'Gemini key missing — switch Provider, or add GEMINI_API_KEY to .env'
-      : 'Add GEMINI_API_KEY to backend/.env (free at aistudio.google.com/apikey)';
+    return 'Gemini key missing — switch Provider or add GEMINI_API_KEY to .env';
   }
   return 'Mock replies — no API key for this provider';
 }
 
 export function getConfigPayload() {
-  const providers: Provider[] = ['anthropic', 'openai', 'gemini'];
   const providerStatus = Object.fromEntries(
-    providers.map((p) => [
+    ALL_PROVIDERS.map((p) => [
       p,
       {
         hasApiKey: hasApiKey(p),
@@ -47,9 +45,7 @@ export function getConfigPayload() {
     ])
   );
 
-  const defaultProvider =
-    (['openai', 'anthropic', 'gemini'] as Provider[]).find((p) => isLiveProvider(p)) ??
-    'anthropic';
+  const defaultProvider = ALL_PROVIDERS.find((p) => isLiveProvider(p)) ?? 'groq';
 
   return {
     mockLlmForced: env.MOCK_LLM,
