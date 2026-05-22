@@ -14,7 +14,7 @@ const PROVIDERS: { value: Provider; label: string }[] = [
 const MODELS: Record<Provider, string[]> = {
   anthropic: ['claude-3-5-sonnet-20241022', 'claude-sonnet-4-20250514'],
   openai: ['gpt-4o-mini', 'gpt-4o', 'gpt-4.1-mini'],
-  gemini: ['gemini-1.5-pro', 'gemini-1.5-flash'],
+  gemini: ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-pro'],
 };
 
 interface NavbarProps {

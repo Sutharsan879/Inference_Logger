@@ -14,7 +14,7 @@ export class GeminiProvider implements LLMProvider {
     this.client = new GoogleGenerativeAI(env.GEMINI_API_KEY!);
   }
 
-  async complete(messages: ChatMessage[], model = 'gemini-1.5-pro'): Promise<LLMResponse> {
+  async complete(messages: ChatMessage[], model = 'gemini-2.0-flash'): Promise<LLMResponse> {
     const { systemInstruction, history, message } = toGeminiInput(messages);
     const genModel = this.client.getGenerativeModel({ model, systemInstruction });
     const chat = genModel.startChat({ history });
@@ -25,7 +25,7 @@ export class GeminiProvider implements LLMProvider {
   async stream(
     messages: ChatMessage[],
     onToken: (token: string) => void,
-    model = 'gemini-1.5-pro'
+    model = 'gemini-2.0-flash'
   ): Promise<LLMResponse> {
     const { systemInstruction, history, message } = toGeminiInput(messages);
     const genModel = this.client.getGenerativeModel({ model, systemInstruction });

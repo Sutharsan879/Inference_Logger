@@ -7,7 +7,7 @@ import type { ChatMessage, Provider, TokenUsage } from '@/types';
 const DEFAULT_MODELS: Record<Provider, string> = {
   anthropic: 'claude-3-5-sonnet-20241022',
   openai: 'gpt-4o-mini',
-  gemini: 'gemini-1.5-pro',
+  gemini: 'gemini-2.0-flash',
 };
 
 interface UseChatOptions {
