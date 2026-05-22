@@ -18,15 +18,18 @@ export async function ensureServer(): Promise<void> {
     getEnv();
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Invalid environment';
-    throw new Error(`${message}. Set DATABASE_URL and other vars in Vercel → Settings → Environment Variables.`);
+    throw new Error(
+      `${message}. Set DATABASE_URL (mongodb+srv://...) and other vars in Vercel → Environment Variables.`
+    );
   }
 
+  // Prisma connects on first query — avoid explicit $connect() on serverless (Vercel)
   try {
-    await prisma.$connect();
+    await prisma.$runCommandRaw({ ping: 1 });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Database connection failed';
     throw new Error(
-      `${message}. Check Atlas Network Access (0.0.0.0/0) and DATABASE_URL on Vercel.`
+      `${message}. Check Atlas: Network Access 0.0.0.0/0, user/password, and DATABASE_URL with /inference_logs`
     );
   }
 

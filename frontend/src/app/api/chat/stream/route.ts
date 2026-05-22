@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { ensureServer } from '@/server/init';
 import { runStreamChat, type StreamChatInput } from '@backend/services/stream-chat.service';
 
@@ -6,8 +7,20 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
-  await ensureServer();
-  const body = (await request.json()) as StreamChatInput;
+  let body: StreamChatInput;
+  try {
+    body = (await request.json()) as StreamChatInput;
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  try {
+    await ensureServer();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Server not ready';
+    console.error('[api/chat/stream] ensureServer', err);
+    return NextResponse.json({ error: message }, { status: 503 });
+  }
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
