@@ -11,7 +11,7 @@ function buildResponse(messages: ChatMessage[], streamed = false): LLMResponse {
   const promptTokens = estimateTokens(promptText);
   const reply = streamed
     ? `I understand you said: "${lastUser?.content ?? 'hello'}". This is a mock streaming response for local development.`
-    : `[Mock] Response to: "${lastUser?.content ?? 'hello'}". Configure ANTHROPIC_API_KEY or OPENAI_API_KEY for real LLM calls.`;
+    : `[Mock] Response to: "${lastUser?.content ?? 'hello'}". Configure ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY for real LLM calls.`;
   const completionTokens = estimateTokens(reply);
   return {
     content: reply,

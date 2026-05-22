@@ -7,8 +7,8 @@ export function buildHint(): string {
   if (env.MOCK_LLM) {
     return 'Set MOCK_LLM=false in backend/.env and add an API key for real AI answers.';
   }
-  if (!hasApiKey('anthropic') && !hasApiKey('openai')) {
-    return 'Add ANTHROPIC_API_KEY or OPENAI_API_KEY to backend/.env for real AI answers.';
+  if (!hasApiKey('anthropic') && !hasApiKey('openai') && !hasApiKey('gemini')) {
+    return 'Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY to backend/.env for real AI answers.';
   }
   return 'Select a provider that has an API key configured (see badge).';
 }
@@ -22,9 +22,14 @@ export function getProviderHint(provider: Provider): string {
       : 'Add ANTHROPIC_API_KEY to backend/.env';
   }
   if (provider === 'openai' && !hasApiKey('openai')) {
-    return hasApiKey('anthropic')
-      ? 'OpenAI key missing — switch Provider to Anthropic, or add OPENAI_API_KEY to .env'
+    return hasApiKey('anthropic') || hasApiKey('gemini')
+      ? 'OpenAI key missing — switch Provider, or add OPENAI_API_KEY to .env'
       : 'Add OPENAI_API_KEY to backend/.env';
+  }
+  if (provider === 'gemini' && !hasApiKey('gemini')) {
+    return hasApiKey('openai') || hasApiKey('anthropic')
+      ? 'Gemini key missing — switch Provider, or add GEMINI_API_KEY to .env'
+      : 'Add GEMINI_API_KEY to backend/.env (free at aistudio.google.com/apikey)';
   }
   return 'Mock replies — no API key for this provider';
 }

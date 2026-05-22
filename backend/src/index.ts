@@ -55,10 +55,10 @@ async function start() {
     console.log(`Backend running on :${env.PORT}`);
     if (env.MOCK_LLM) {
       console.log('⚠ AI mode: MOCK (set MOCK_LLM=false + API key in .env for real answers)');
-    } else if (hasApiKey('anthropic') || hasApiKey('openai')) {
+    } else if (hasApiKey('anthropic') || hasApiKey('openai') || hasApiKey('gemini')) {
       console.log('✓ AI mode: LIVE (real model responses when you chat)');
     } else {
-      console.log('⚠ AI mode: MOCK — add ANTHROPIC_API_KEY or OPENAI_API_KEY to .env');
+      console.log('⚠ AI mode: MOCK — add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY to .env');
     }
   });
 

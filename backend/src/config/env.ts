@@ -22,6 +22,10 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform((v) => (v?.trim() ? v.trim() : undefined)),
+  GEMINI_API_KEY: z
+    .string()
+    .optional()
+    .transform((v) => (v?.trim() ? v.trim() : undefined)),
   MOCK_LLM: z
     .string()
     .optional()

@@ -3,6 +3,7 @@ import { env } from '../config/env';
 import type { LLMProvider } from './base.provider';
 import { AnthropicProvider } from './anthropic.provider';
 import { OpenAIProvider } from './openai.provider';
+import { GeminiProvider } from './gemini.provider';
 import { MockProvider } from './mock.provider';
 
 const mock = new MockProvider();
@@ -13,6 +14,8 @@ export function hasApiKey(provider: Provider): boolean {
       return Boolean(env.ANTHROPIC_API_KEY?.trim());
     case 'openai':
       return Boolean(env.OPENAI_API_KEY?.trim());
+    case 'gemini':
+      return Boolean(env.GEMINI_API_KEY?.trim());
     default:
       return false;
   }
@@ -42,8 +45,11 @@ class ProviderFactory {
         }
         return new OpenAIProvider();
       case 'gemini':
-        console.warn('Gemini not implemented — using mock provider');
-        return mock;
+        if (!hasApiKey('gemini')) {
+          console.warn('GEMINI_API_KEY missing — using mock. Add key to backend/.env for real answers.');
+          return mock;
+        }
+        return new GeminiProvider();
       default:
         return mock;
     }
