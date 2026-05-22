@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-logger-config
+  namespace: llm-inference-logger
+data:
+  CORS_ORIGINS: "http://localhost:3000"
+  MOCK_LLM: "true"
+  INGESTION_MODE: "http"
+  INGESTION_BASE_URL: "http://llm-logger-backend:8000"
+  MAX_CONTEXT_MESSAGES: "20"
+  NEXT_PUBLIC_API_URL: "http://llm-logger-backend:8000"

@@ -1,0 +1,17 @@
+{
+  "name": "LLM Inference Logger",
+  "short_name": "Inference Logger",
+  "description": "LLM observability — chat, logs, and metrics",
+  "start_url": "/chat",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

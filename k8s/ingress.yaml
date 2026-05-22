@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: llm-logger-ingress
+  namespace: llm-inference-logger
+spec:
+  rules:
+    - host: llm-logger.local
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: llm-logger-backend
+                port:
+                  number: 8000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: llm-logger-frontend
+                port:
+                  number: 3000
