@@ -9,9 +9,14 @@ const nextConfig = {
   experimental: {
     externalDir: true,
     serverComponentsExternalPackages: ['@prisma/client'],
+    outputFileTracingIncludes: {
+      '/api/**/*': [
+        './node_modules/.prisma/client/**',
+        './node_modules/@prisma/client/**',
+      ],
+    },
   },
   webpack: (config) => {
-    // Vercel builds from frontend/; backend imports must resolve frontend node_modules
     config.resolve.modules = [
       path.resolve(__dirname, 'node_modules'),
       ...(config.resolve.modules ?? ['node_modules']),
