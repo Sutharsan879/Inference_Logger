@@ -27,7 +27,10 @@ const envSchema = z.object({
     .optional()
     .transform((v) => v === 'true' || v === '1'),
   INGESTION_BASE_URL: z.string().url().optional(),
-  INGESTION_MODE: z.enum(['http', 'queue']).default('queue'),
+  INGESTION_MODE: z
+    .string()
+    .optional()
+    .transform((v) => (v === 'http' ? 'http' : 'queue')),
   MAX_CONTEXT_MESSAGES: z.coerce.number().default(20),
 });
 
