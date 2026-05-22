@@ -1,9 +1,10 @@
 import { config } from 'dotenv';
 import { resolve } from 'path';
+import { z } from 'zod';
 
 config({ path: resolve(process.cwd(), '.env') });
-
-import { z } from 'zod';
+config({ path: resolve(process.cwd(), '.env.local') });
+config({ path: resolve(process.cwd(), '../backend/.env') });
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -32,11 +33,13 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
+let cached: Env | null = null;
+
 function loadEnv(): Env {
   const parsed = envSchema.safeParse(process.env);
   if (!parsed.success) {
-    console.error('Invalid environment variables:', parsed.error.flatten().fieldErrors);
-    process.exit(1);
+    const msg = JSON.stringify(parsed.error.flatten().fieldErrors);
+    throw new Error(`Invalid environment variables: ${msg}`);
   }
   const data = parsed.data;
   if (!data.INGESTION_BASE_URL) {
@@ -48,4 +51,14 @@ function loadEnv(): Env {
   return data as Env;
 }
 
-export const env = loadEnv();
+export function getEnv(): Env {
+  if (!cached) cached = loadEnv();
+  return cached;
+}
+
+/** @deprecated use getEnv() — lazy load for serverless */
+export const env: Env = new Proxy({} as Env, {
+  get(_target, prop: string | symbol) {
+    return getEnv()[prop as keyof Env];
+  },
+});

@@ -14,12 +14,20 @@ export async function ensureServer(): Promise<void> {
   loadEnv();
 
   try {
+    const { getEnv } = await import('@backend/config/env');
+    getEnv();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Invalid environment';
+    throw new Error(`${message}. Set DATABASE_URL and other vars in Vercel → Settings → Environment Variables.`);
+  }
+
+  try {
     await prisma.$connect();
   } catch (err) {
-    console.error(
-      'Prisma not ready. Stop dev server (Ctrl+C), then run:\n  cd frontend\n  npm run db:setup\n  npm run dev'
+    const message = err instanceof Error ? err.message : 'Database connection failed';
+    throw new Error(
+      `${message}. Check Atlas Network Access (0.0.0.0/0) and DATABASE_URL on Vercel.`
     );
-    throw err;
   }
 
   const { startQueueWorker } = await import('@backend/ingestion/eventQueue');
